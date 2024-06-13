@@ -1,0 +1,13 @@
+[Unit]
+Description=Script Daemon For PiTunes
+
+[Service]
+Type=simple
+#User=
+#Group=
+ExecStart=/usr/local/bin/pitunes.sh
+Restart=always
+StandardOutput=file:%h/pitunes.log
+
+[Install]
+WantedBy=default.target

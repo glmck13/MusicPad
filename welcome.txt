@@ -1,0 +1,7 @@
+Hello! Welcome to PiTunes, a music player brought to you by G!
+<break/><break/><break/>
+Press backspace for the current playlist.
+To go to the next playlist, press plus or minus.
+To get the songs in the current playlist, press enter.
+<break/><break/>
+Enjoy the music!

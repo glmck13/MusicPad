@@ -1,0 +1,2 @@
+@reboot sleep 30; sudo $HOME/bin/blueconn.sh
+@reboot $HOME/bin/mckbridge.sh &
