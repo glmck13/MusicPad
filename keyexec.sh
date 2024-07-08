@@ -1,15 +1,18 @@
 #!/bin/ksh
 
 #set -x
+#alias sonos='echo'
+
+export SPKR=Move
 
 typeset -A action
-action["MSG_WELCOME"]="play"
+action["MSG_WELCOME"]="init play"
 action["KEY_BACKSPACE"]="play"
-action["KEY_KPMINUS"]="list- play"
-action["KEY_KPPLUS"]="list+ play"
-action["KEY_ENTER"]="play"
-action["KEY_KPSLASH"]="play"
-action["KEY_KPASTERISK"]="play"
+action["KEY_KPMINUS"]="lower play"
+action["KEY_KPPLUS"]="raise play"
+action["KEY_KPENTER"]="pause play"
+action["KEY_KPSLASH"]="shuffle"
+action["KEY_KPASTERISK"]="clear"
 action["KEY_DELETE"]="skip"
 action["KEY_KPDOT"]="skip"
 action["KEY_KP0"]=""
@@ -22,7 +25,7 @@ action["KEY_KP3"]="play"
 action["KEY_PAGEDOWN"]="play"
 action["KEY_KP4"]="play"
 action["KEY_LEFT"]="play"
-action["KEY_KP5"]=""
+action["KEY_KP5"]="play"
 action["KEY_KP6"]="play"
 action["KEY_RIGHT"]="play"
 action["KEY_KP7"]="play"
@@ -35,36 +38,99 @@ action["KEY_PAGEUP"]="play"
 CDN=$HOME/venv/cdn
 QUEUE=$HOME/venv/queue
 
-MAXLIST=$(ls -1 songs-*.txt | wc -l)
-let list=$MAXLIST-1
+if [ -s songs-sonos.txt ]; then
+	mode="sonos"
+else
+	mode="speaker"
+	MAXLIST=$(ls -1 songs-*.txt | wc -l)
+	let list=$MAXLIST-1
+fi
+
+init="n"
 
 while read line
 do
 	key=$line key=${key##*\(} key=${key%%\)*}
 	for verb in ${action[$key]}
 	do
+
 	case "$verb" in
-	list+)
-		let list="($list+$MAXLIST+1)%$MAXLIST"
+
+	init)
+		if [ "$mode" = "sonos" ]; then
+			if [ "$init" != "y" ]; then
+				>$QUEUE/exit
+				sonos cq
+				sonos volume 20 
+			fi
+		fi
 		;;
-	list-)
-		let list="($list+$MAXLIST-1)%$MAXLIST"
+	raise)
+		if [ "$mode" = "sonos" ]; then
+			sonos relative_volume +3
+		else
+			let list="($list+$MAXLIST+1)%$MAXLIST"
+		fi
+		;;
+	lower)
+		if [ "$mode" = "sonos" ]; then
+			sonos relative_volume -3
+		else
+			let list="($list+$MAXLIST-1)%$MAXLIST"
+		fi
+		;;
+	pause)
+		if [ "$mode" = "sonos" ]; then
+			sonos pauseplay
+		fi
+		;;
+	shuffle)
+		if [ "$mode" = "sonos" ]; then
+			sonos play_mode shuffle
+		fi
 		;;
 	skip)
-		pkill -u pi mpg123 >/dev/null 2>&1
+		if [ "$mode" = "sonos" ]; then
+			sonos next
+		else
+			pkill -u pi mpg123 >/dev/null 2>&1
+		fi
+		;;
+	clear)
+		if [ "$mode" = "sonos" ]; then
+			sonos cq
+		else
+			rm -f $QUEUE/*
+		fi
 		;;
 	play)
-		song=$(grep "$key," songs-$list.txt)
-		song=${song##*,} song=${song//\//:}
-		if [ "$song" ]; then
-			>$QUEUE/$(date "+%s%3N"):$song
+		if [ "$mode" = "sonos" ]; then
+			song=$(grep "$key," songs-sonos.txt)
+			song=${song##*,}
+			if [ "$song" ]; then
+				if [[ "$song" == *playlist* ]]; then
+					sonos play_sharelink $song
+				elif [ "$init" != "y" ]; then
+					sonos play_file $song
+					init="y"
+				fi
+			fi
+		else
+			song=$(grep "$key," songs-$list.txt)
+			song=${song##*,} song=${song//\//:}
+			if [ "$song" ]; then
+				>$QUEUE/$(date "+%s%3N"):$song
+			fi
 		fi
 		;;
 	*)
 		;;
 	esac
+
 	done
 done
 
 >$QUEUE/exit
-pkill -u pi mpg123 >/dev/null 2>&1
+if [ "$mode" != "sonos" ]; then
+	pkill -u pi mpg123 >/dev/null 2>&1
+fi

@@ -10,6 +10,7 @@ cd $QUEUE; rm -f *
 while true
 do
 	if [ -f exit ]; then
+		rm -f exit
 		break
 	fi
 

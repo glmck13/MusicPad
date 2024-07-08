@@ -1,0 +1,56 @@
+#!/bin/ksh
+
+#set -x
+
+cmd=${1:help}
+RUN=~/venv/src
+cd $RUN
+
+. ~/etc/awscreds.conf
+
+case "$cmd" in
+	add)
+		description="${2:?}"
+		sharelink="${3:?}"
+		spl=${sharelink} spl=${spl%\?*} spl=${spl##*/} spl="spotify:playlist:"$spl
+		echo "KEY_TBD,${description},${spl}" >>songs-sonos.txt
+
+		echo "Entering Sonos mode!" >welcome-sonos.new
+		echo "MSG_WELCOME,,welcome-sonos.mp3" >songs-sonos.new
+
+		n=0
+		while read line
+		do
+			[[ $line == KEY* ]] || continue
+			let n=$n+1
+			line=${line#*,} description=${line%%,*} spl=${line##*,}
+			echo "KEY_KP${n},${description},${spl}" >>songs-sonos.new
+			echo "Press ${n} for ${description}." >>welcome-sonos.new
+		done <songs-sonos.txt
+
+		echo "Press plus sign to raise volume." >>welcome-sonos.new
+		echo "Press minus sign to lower volume." >>welcome-sonos.new
+		echo "Press dot to skip song." >>welcome-sonos.new
+		echo "Press slash to shuffle queue." >>welcome-sonos.new
+		echo "Press star to clear queue." >>welcome-sonos.new
+		echo "Enjoy the music!" >>welcome-sonos.new
+
+		mv welcome-sonos.new welcome-sonos.txt
+		mv songs-sonos.new songs-sonos.txt
+		AWS_VOICE="Arthur" aws-polly.sh <welcome-sonos.txt >welcome-sonos.mp3
+		;;
+
+	rm)
+		rm -f welcome-sonos.* songs-sonos.*
+		;;
+
+	ls)
+		cat welcome-sonos.txt 2>/dev/null
+		echo; echo
+		cat songs-sonos.txt 2>/dev/null
+		;;
+
+	help|*)
+		echo "Usage: ${0##*/} [add|rm|ls]"
+		;;
+esac
