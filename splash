@@ -31,6 +31,7 @@ case "$cmd" in
 		echo "Press plus sign to raise volume." >>welcome-sonos.new
 		echo "Press minus sign to lower volume." >>welcome-sonos.new
 		echo "Press dot to skip song." >>welcome-sonos.new
+		echo "Press enter to pause song." >>welcome-sonos.new
 		echo "Press slash to shuffle queue." >>welcome-sonos.new
 		echo "Press star to clear queue." >>welcome-sonos.new
 		echo "Enjoy the music!" >>welcome-sonos.new
