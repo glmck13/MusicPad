@@ -8,6 +8,7 @@ export SPKR=Move
 typeset -A action
 action["MSG_WELCOME"]="init play"
 action["KEY_BACKSPACE"]="play"
+action["KEY_KPEQUAL"]=""
 action["KEY_KPMINUS"]="lower play"
 action["KEY_KPPLUS"]="raise play"
 action["KEY_KPENTER"]="pause play"
@@ -34,6 +35,12 @@ action["KEY_KP8"]="play"
 action["KEY_UP"]="play"
 action["KEY_KP9"]="play"
 action["KEY_PAGEUP"]="play"
+
+action["KEY_EQUAL"]=action["KEY_KPEQUAL"]
+action["KEY_MINUS"]=action["KEY_KPMINUS"]
+action["KEY_ENTER"]=action["KEY_KPENTER"]
+action["KEY_SLASH"]=action["KEY_KPSLASH"]
+action["KEY_DOT"]=action["KEY_KPDOT"]
 
 CDN=$HOME/venv/cdn
 QUEUE=$HOME/venv/queue
