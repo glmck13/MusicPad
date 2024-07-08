@@ -1,0 +1,13 @@
+[Unit]
+Description=Script Daemon For MusicPad
+
+[Service]
+Type=simple
+#User=
+#Group=
+ExecStart=%h/venv/src/musicpad.sh
+Restart=always
+StandardOutput=file:%h/venv/log/musicpad.log
+
+[Install]
+WantedBy=default.target

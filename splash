@@ -15,7 +15,7 @@ case "$cmd" in
 		spl=${sharelink} spl=${spl%\?*} spl=${spl##*/} spl="spotify:playlist:"$spl
 		echo "KEY_TBD,${description},${spl}" >>songs-sonos.txt
 
-		echo "Entering Sonos mode!" >welcome-sonos.new
+		echo "Entering Sonos mode!<break/>" >welcome-sonos.new
 		echo "MSG_WELCOME,,welcome-sonos.mp3" >songs-sonos.new
 
 		n=0
@@ -25,15 +25,9 @@ case "$cmd" in
 			let n=$n+1
 			line=${line#*,} description=${line%%,*} spl=${line##*,}
 			echo "KEY_KP${n},${description},${spl}" >>songs-sonos.new
-			echo "Press ${n} for ${description}." >>welcome-sonos.new
+			echo "Press ${n} for ${description}.<break/>" >>welcome-sonos.new
 		done <songs-sonos.txt
 
-		echo "Press plus sign to raise volume." >>welcome-sonos.new
-		echo "Press minus sign to lower volume." >>welcome-sonos.new
-		echo "Press dot to skip song." >>welcome-sonos.new
-		echo "Press enter to pause song." >>welcome-sonos.new
-		echo "Press slash to shuffle queue." >>welcome-sonos.new
-		echo "Press star to clear queue." >>welcome-sonos.new
 		echo "Enjoy the music!" >>welcome-sonos.new
 
 		mv welcome-sonos.new welcome-sonos.txt

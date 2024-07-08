@@ -1,4 +1,4 @@
-Hello! Welcome to PiTunes, a music player brought to you by G!
+Hello! Welcome to MusicPad, a music player brought to you by G!
 <break/><break/><break/>
 Press backspace for the current playlist.
 To go to the next playlist, press plus or minus.
