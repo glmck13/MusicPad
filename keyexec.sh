@@ -68,6 +68,7 @@ do
 			if [ "$init" != "y" ]; then
 				>$QUEUE/exit
 				sonos cq
+				sonos play_mode NORMAL
 				sonos volume 20 
 			fi
 		fi
