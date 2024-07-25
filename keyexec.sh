@@ -94,7 +94,7 @@ do
 		;;
 	shuffle)
 		if [ "$mode" = "sonos" ]; then
-			sonos play_mode shuffle
+			sonos play_mode shuffle_norepeat
 		fi
 		;;
 	skip)
