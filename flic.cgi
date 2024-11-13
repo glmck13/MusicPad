@@ -1,12 +1,13 @@
 #!/bin/bash
 
-SPOOLDIR=/var/spool/asterisk/outgoing/
 TMPDIR=${DOCUMENT_ROOT}/tmp
+SPOOLDIR=/var/spool/asterisk/outgoing/
 MP3CONF=${DOCUMENT_ROOT}/cdn/mp3.conf
 CALLFILE=${TMPDIR}/callfile$$.txt
+LOCKFILE=${TMPDIR}/flic.lock
 DESTINATION=6300
 
-exec 3<> /tmp/flic.lock
+exec 3<> $LOCKFILE
 flock -x 3
 
 typeset -A CLICKMAP
@@ -31,6 +32,7 @@ extension=$(grep ${extension:-.} $MP3CONF | shuf -n1) extension=${extension%%\|*
 echo $event $button $click $extension >&2
 
 in_progress=$(ls ${SPOOLDIR})
+
 if [ ! "$in_progress" ]; then
 cat - >${CALLFILE} <<-EOF
 Channel: PJSIP/${DESTINATION}
@@ -41,6 +43,9 @@ Callerid: flic
 WaitTime: 12
 EOF
 mv ${CALLFILE} ${SPOOLDIR}
+echo "Queued: $(ls ${SPOOLDIR})" >&2
+else
+echo "Pending: $in_progress" >&2
 fi
 
 echo "OK"
